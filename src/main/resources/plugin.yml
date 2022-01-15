@@ -1,0 +1,8 @@
+name: CustomItems
+version: '${project.version}'
+main: dev.negativekb.customitems.CustomItems
+api-version: 1.18
+authors: [ Negative ]
+description: Custom Items for Negative's SMP Server
+
+depend: [WorldEdit, WorldGuard]

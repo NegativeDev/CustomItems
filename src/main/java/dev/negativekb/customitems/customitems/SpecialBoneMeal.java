@@ -3,6 +3,8 @@ package dev.negativekb.customitems.customitems;
 import dev.negativekb.customitems.core.registry.Registry;
 import dev.negativekb.customitems.core.registry.RegistryType;
 import dev.negativekb.customitems.core.structure.CustomItem;
+import org.bukkit.Effect;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -11,9 +13,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 
 import java.util.List;
+import java.util.Objects;
 
 @Registry(type = RegistryType.CUSTOM_ITEM)
 public class SpecialBoneMeal extends CustomItem {
@@ -39,6 +43,9 @@ public class SpecialBoneMeal extends CustomItem {
 
                 crop.setAge(crop.getMaximumAge());
                 clickedBlock.setBlockData(crop);
+                Location location = clickedBlock.getLocation();
+                Objects.requireNonNull(location.getWorld())
+                        .playEffect(location, Effect.BONE_MEAL_USE, 10, 10);
 
                 ItemStack item = event.getItem();
                 if (item == null) // Something went wrong.
@@ -62,7 +69,7 @@ public class SpecialBoneMeal extends CustomItem {
     }
 
     @Override
-    public ShapedRecipe getRecipe() {
+    public Recipe getRecipe() {
         ItemStack item = getItem();
         item.setAmount(4);
 

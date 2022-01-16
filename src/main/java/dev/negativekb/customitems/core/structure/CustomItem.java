@@ -7,13 +7,10 @@ import org.bukkit.Material;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 
 import java.util.List;
@@ -24,9 +21,13 @@ public abstract class CustomItem {
 
     @Getter
     private final String id;
+    @Getter
     private final String displayName;
     private final List<String> lore;
     private final Material material;
+
+    // Custom Attributes
+    private Consumer<ItemStack> itemAttributesConsumer;
 
     // Events
     private Consumer<BlockBreakEvent> blockBreakEventConsumer;
@@ -36,8 +37,11 @@ public abstract class CustomItem {
     private Consumer<PlayerJoinEvent> joinEventConsumer;
     private Consumer<PlayerQuitEvent> quitEventConsumer;
     private Consumer<PlayerInteractEvent> interactEventConsumer;
+    private Consumer<PlayerInteractAtEntityEvent> interactAtEntityEventConsumer;
     private Consumer<PlayerTeleportEvent> teleportEventConsumer;
     private Consumer<FoodLevelChangeEvent> foodLevelChangeEventConsumer;
+    private Consumer<PlayerBucketEmptyEvent> bucketEmptyEventConsumer;
+    private Consumer<PlayerItemConsumeEvent> consumeEventConsumer;
 
     public CustomItem(String id, String displayName, List<String> lore, Material material) {
         this.id = id;
@@ -50,6 +54,10 @@ public abstract class CustomItem {
         ItemStack item = new ItemBuilder(material).setName(displayName)
                 .setLore(lore).build();
 
+        // Adds extra attributes set by developers
+        Optional.ofNullable(itemAttributesConsumer)
+                .ifPresent(function -> function.accept(item));
+
         NBTItem nbtItem = new NBTItem(item);
         nbtItem.setBoolean("custom-item", true);
         nbtItem.setString("custom-item-type", this.id);
@@ -57,8 +65,7 @@ public abstract class CustomItem {
         return nbtItem.getItem();
     }
 
-    public abstract ShapedRecipe getRecipe();
-
+    public abstract Recipe getRecipe();
 
     // =======================================
     // LISTENERS
@@ -99,6 +106,18 @@ public abstract class CustomItem {
 
     public void setInteractEvent(Consumer<PlayerInteractEvent> function) {
         this.interactEventConsumer = function;
+    }
+
+    public void setBucketEmptyEvent(Consumer<PlayerBucketEmptyEvent> function) {
+        this.bucketEmptyEventConsumer = function;
+    }
+
+    public void setInteractAtEntityEvent(Consumer<PlayerInteractAtEntityEvent> function) {
+        this.interactAtEntityEventConsumer = function;
+    }
+
+    public void setConsumeEvent(Consumer<PlayerItemConsumeEvent> function) {
+        this.consumeEventConsumer = function;
     }
 
     public void onBlockBreak(BlockBreakEvent event) {
@@ -144,5 +163,24 @@ public abstract class CustomItem {
     public void onInteractEvent(PlayerInteractEvent event) {
         Optional.ofNullable(interactEventConsumer).ifPresent(function ->
                 function.accept(event));
+    }
+
+    public void onBucketEmpty(PlayerBucketEmptyEvent event) {
+        Optional.ofNullable(bucketEmptyEventConsumer).ifPresent(function ->
+                function.accept(event));
+    }
+
+    public void onEntityInteract(PlayerInteractAtEntityEvent event) {
+        Optional.ofNullable(interactAtEntityEventConsumer).ifPresent(function ->
+                function.accept(event));
+    }
+
+    public void onConsume(PlayerItemConsumeEvent event) {
+        Optional.ofNullable(consumeEventConsumer).ifPresent(function ->
+                function.accept(event));
+    }
+
+    public void setItemAttributes(Consumer<ItemStack> function) {
+        this.itemAttributesConsumer = function;
     }
 }

@@ -23,10 +23,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 
 @Registry(type = RegistryType.LISTENER)
@@ -154,6 +151,39 @@ public class CustomItemListener implements Listener {
             customItemManager.getCustomItem(itemInMainHand).ifPresent(customItem ->
                     customItem.onEntityDamageEntity(event));
         }
+    }
+
+    @EventHandler
+    public void onBucketEmpty(PlayerBucketEmptyEvent event) {
+        Player player = event.getPlayer();
+        ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
+        if (itemInMainHand.getType() == Material.AIR)
+            return;
+
+        customItemManager.getCustomItem(itemInMainHand).ifPresent(customItem ->
+                customItem.onBucketEmpty(event));
+    }
+
+    @EventHandler
+    public void onEntityInteract(PlayerInteractAtEntityEvent event) {
+        Player player = event.getPlayer();
+        ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
+        if (itemInMainHand.getType() == Material.AIR)
+            return;
+
+        customItemManager.getCustomItem(itemInMainHand).ifPresent(customItem ->
+                customItem.onEntityInteract(event));
+    }
+
+    @EventHandler
+    public void onConsume(PlayerItemConsumeEvent event) {
+        Player player = event.getPlayer();
+        ItemStack item = event.getItem();
+        if (item.getType() == Material.AIR)
+            return;
+
+        customItemManager.getCustomItem(item).ifPresent(customItem ->
+                customItem.onConsume(event));
     }
 
 }

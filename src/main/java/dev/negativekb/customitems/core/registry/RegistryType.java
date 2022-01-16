@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 
 /**
@@ -79,7 +80,7 @@ public enum RegistryType {
                 CustomItem customItem = (CustomItem) clazz.getDeclaredConstructor().newInstance();
                 customItemManager.registerCustomItem(customItem);
 
-                ShapedRecipe recipe = customItem.getRecipe();
+                Recipe recipe = customItem.getRecipe();
                 if (recipe != null)
                     Bukkit.getServer().addRecipe(recipe);
             }

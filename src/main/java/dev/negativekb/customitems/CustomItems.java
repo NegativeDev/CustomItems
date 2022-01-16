@@ -2,6 +2,7 @@ package dev.negativekb.customitems;
 
 import dev.negativekb.api.BasePlugin;
 import dev.negativekb.customitems.core.CoreInitializer;
+import dev.negativekb.customitems.core.Locale;
 import lombok.Getter;
 
 public final class CustomItems extends BasePlugin {
@@ -14,6 +15,7 @@ public final class CustomItems extends BasePlugin {
         // Plugin startup logic
         super.onEnable();
         instance = this;
+        Locale.init(this);
 
         new CoreInitializer();
     }
